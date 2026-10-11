@@ -2,61 +2,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aerox DPI Lab</title>
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-    }
-    button {
-      padding: 12px 22px;
-      margin: 8px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 25px;
-      color: #aaa;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aerox DPI Lab</title>
+<style>
+body {
+  background: #101010;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 35px;
+}
+button {
+  padding: 12px 18px;
+  margin: 5px;
+  cursor: pointer;
+}
+pre {
+  background: #1c1c1c;
+  padding: 15px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+</style>
 </head>
 <body>
-  <h1>Aerox DPI Lab</h1>
-  <p>Browser-to-mouse connection test</p>
+<h1>Aerox DPI Lab</h1>
+<p>Hardware diagnostics — no DPI commands will be sent.</p>
 
-  <button id="connect">Connect mouse</button>
-  <p id="status">Not connected</p>
+<button id="connect">Connect mouse</button>
+<button id="disconnect">Disconnect</button>
+<pre id="output">Not connected.</pre>
 
-  <script>
-    const status = document.getElementById("status");
+<script>
+let devices = [];
 
-    document.getElementById("connect").addEventListener("click", async () => {
-      if (!("hid" in navigator)) {
-        status.textContent = "WebHID is unavailable in this browser.";
-        return;
-      }
+const output = document.getElementById("output");
 
-      try {
-        const devices = await navigator.hid.requestDevice({
-          filters: []
-        });
+document.getElementById("connect").onclick = async () => {
+  try {
+    devices = await navigator.hid.requestDevice({ filters: [] });
 
-        if (devices.length === 0) {
-          status.textContent = "No device selected.";
-          return;
-        }
+    if (!devices.length) {
+      output.textContent = "No device selected.";
+      return;
+    }
 
-        status.textContent = devices.map(device =>
-          `${device.productName} — Vendor ID: ${device.vendorId}`
-        ).join(" | ");
-      } catch (error) {
-        status.textContent = `${error.name}: ${error.message}`;
-      }
-    });
-  </script>
+    output.textContent = devices.map((d, i) => {
+      const collections = d.collections.map(c =>
+        `Usage page: ${c.usagePage}, Usage: ${c.usage}`
+      ).join("\n  ");
+
+      return `Device ${i + 1}
+Name: ${d.productName}
+Vendor ID: ${d.vendorId}
+Product ID: ${d.productId}
+Opened: ${d.opened}
+Collections:
+  ${collections || "No collections reported"}`;
+    }).join("\n\n");
+  } catch (e) {
+    output.textContent = `${e.name}: ${e.message}`;
+  }
+};
+
+document.getElementById("disconnect").onclick = async () => {
+  devices = [];
+  output.textContent = "Disconnected from this page.";
+};
+</script>
 </body>
 </html>
