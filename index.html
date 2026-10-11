@@ -2,73 +2,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aerox DPI Lab</title>
-<style>
-body {
-  background: #101010;
-  color: white;
-  font-family: Arial, sans-serif;
-  padding: 35px;
-}
-button {
-  padding: 12px 18px;
-  margin: 5px;
-  cursor: pointer;
-}
-pre {
-  background: #1c1c1c;
-  padding: 15px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-</style>
-</head>
-<body>
-<h1>Aerox DPI Lab</h1>
-<p>Hardware diagnostics — no DPI commands will be sent.</p>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aerox DPI Lab</title>
 
-<button id="connect">Connect mouse</button>
-<button id="disconnect">Disconnect</button>
-<pre id="output">Not connected.</pre>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 35px 20px;
+      background: #101014;
+      color: #f5f5f7;
+      font-family: Arial, sans-serif;
+    }
+
+    main {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #aaaab5;
+      line-height: 1.6;
+    }
+
+    .panel {
+      margin-top: 24px;
+      padding: 22px;
+      border: 1px solid #303039;
+      border-radius: 12px;
+      background: #19191f;
+    }
+
+    button {
+      margin: 5px 5px 5px 0;
+      padding: 12px 18px;
+      border: 1px solid #444451;
+      border-radius: 8px;
+      background: #292932;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #383844;
+    }
+
+    #status {
+      color: #c7c7d2;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      padding: 16px;
+      border-radius: 8px;
+      background: #0b0b0e;
+      color: #d7d7e0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .warning {
+      color: #e5c98b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+<main>
+  <h1>Aerox DPI Lab</h1>
+
+  <p class="subtitle">
+    SteelSeries Aerox 3 Wireless — hardware diagnostics.
+    This test inspects device information only.
+  </p>
+
+  <section class="panel">
+    <h2>Device connection</h2>
+
+    <button id="connect">Connect mouse</button>
+    <button id="disconnect">Disconnect</button>
+
+    <p id="status">Not connected.</p>
+  </section>
+
+  <section class="panel">
+    <h2>HID diagnostic results</h2>
+    <pre id="output">Waiting for device information...</pre>
+
+    <p class="warning">
+      This page does not send hardware commands or change DPI.
+      Only select your own mouse in the browser's device picker.
+    </p>
+  </section>
+</main>
 
 <script>
-let devices = [];
+  const connectButton = document.getElementById("connect");
+  const disconnectButton = document.getElementById("disconnect");
+  const status = document.getElementById("status");
+  const output = document.getElementById("output");
 
-const output = document.getElementById("output");
+  let selectedDevices = [];
 
-document.getElementById("connect").onclick = async () => {
-  try {
-    devices = await navigator.hid.requestDevice({ filters: [] });
-
-    if (!devices.length) {
-      output.textContent = "No device selected.";
+  connectButton.addEventListener("click", async () => {
+    if (!("hid" in navigator)) {
+      status.textContent = "WebHID is not supported in this browser.";
       return;
     }
 
-    output.textContent = devices.map((d, i) => {
-      const collections = d.collections.map(c =>
-        `Usage page: ${c.usagePage}, Usage: ${c.usage}`
-      ).join("\n  ");
+    try {
+      status.textContent = "Waiting for device selection...";
 
-      return `Device ${i + 1}
-Name: ${d.productName}
-Vendor ID: ${d.vendorId}
-Product ID: ${d.productId}
-Opened: ${d.opened}
-Collections:
-  ${collections || "No collections reported"}`;
-    }).join("\n\n");
-  } catch (e) {
-    output.textContent = `${e.name}: ${e.message}`;
-  }
-};
+      selectedDevices = await navigator.hid.requestDevice({
+        filters: [
+          {
+            vendorId: 0x1038,
+            productId: 0x1838
+          }
+        ]
+      });
 
-document.getElementById("disconnect").onclick = async () => {
-  devices = [];
-  output.textContent = "Disconnected from this page.";
-};
+      if (selectedDevices.length === 0) {
+        status.textContent = "No device selected.";
+        output.textContent = "No device information available.";
+        return;
+      }
+
+      const results = selectedDevices.map((device, index) => ({
+        deviceNumber: index + 1,
+        name: device.productName,
+        vendorId: device.vendorId,
+        productId: device.productId,
+        opened: device.opened,
+
+        collections: device.collections.map(collection => ({
+          usagePage: collection.usagePage,
+          usage: collection.usage,
+
+          inputReports: collection.inputReports.map(report => ({
+            reportId: report.reportId,
+            items: report.items.map(item => ({
+              reportSize: item.reportSize,
+              reportCount: item.reportCount
+            }))
+          })),
+
+          outputReports: collection.outputReports.map(report => ({
+            reportId: report.reportId,
+            items: report.items.map(item => ({
+              reportSize: item.reportSize,
+              reportCount: item.reportCount
+            }))
+          })),
+
+          featureReports: collection.featureReports.map(report => ({
+            reportId: report.reportId,
+            items: report.items.map(item => ({
+              reportSize: item.reportSize,
+              reportCount: item.reportCount
+            }))
+          }))
+        }))
+      }));
+
+      status.textContent =
+        `Found ${selectedDevices.length} selected device interface(s).`;
+
+      output.textContent = JSON.stringify(results, null, 2);
+
+    } catch (error) {
+      status.textContent = "Device selection failed.";
+      output.textContent = `${error.name}: ${error.message}`;
+    }
+  });
+
+  disconnectButton.addEventListener("click", () => {
+    selectedDevices = [];
+    status.textContent = "Disconnected from this page.";
+    output.textContent = "Device information cleared.";
+  });
 </script>
 </body>
 </html>
