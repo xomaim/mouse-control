@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aerox DPI Lab</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    button {
+      padding: 12px 22px;
+      margin: 8px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 25px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Aerox DPI Lab</h1>
+  <p>Browser-to-mouse connection test</p>
+
+  <button id="connect">Connect mouse</button>
+  <p id="status">Not connected</p>
+
+  <script>
+    const status = document.getElementById("status");
+
+    document.getElementById("connect").addEventListener("click", async () => {
+      if (!("hid" in navigator)) {
+        status.textContent = "WebHID is unavailable in this browser.";
+        return;
+      }
+
+      try {
+        const devices = await navigator.hid.requestDevice({
+          filters: []
+        });
+
+        if (devices.length === 0) {
+          status.textContent = "No device selected.";
+          return;
+        }
+
+        status.textContent = devices.map(device =>
+          `${device.productName} — Vendor ID: ${device.vendorId}`
+        ).join(" | ");
+      } catch (error) {
+        status.textContent = `${error.name}: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
