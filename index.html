@@ -1,307 +1,167 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TERMINAL // Aerox Control</title>
-
 <style>
-:root {
-  --bg: #080a09;
-  --panel: #0c100d;
-  --line: #29352d;
-  --green: #baff65;
-  --text: #dbe5dc;
-  --muted: #819086;
-  --red: #ff7777;
-  --amber: #ffd166;
-}
+:root{--bg:#080a09;--panel:#0c100d;--line:#29352d;--green:#baff65;--text:#dbe5dc;--muted:#819086;--amber:#ffd166;--red:#ff7777}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 Consolas,"Cascadia Mono","Courier New",monospace;letter-spacing:.025em}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 4px)}
+button,select{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1120px;margin:auto;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);padding:13px 16px;background:#0b0e0c}
+.brand{color:var(--green);font-weight:bold;letter-spacing:.18em}
+.brand small{display:block;color:var(--muted);font-weight:normal;letter-spacing:.1em}
+.status{color:var(--muted)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:8px}
+.dot.on{background:var(--green);box-shadow:0 0 8px #baff6566}
+.layout{display:grid;grid-template-columns:205px 1fr;gap:13px;margin-top:13px}
+.box{border:1px solid var(--line);background:var(--panel);min-width:0}
+.side{padding:12px}
+.label{color:var(--muted);font-size:11px;letter-spacing:.13em;margin:5px 0 12px}
+.nav{display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;color:#9ba89e;padding:10px;margin:3px 0}
+.nav:before{content:"[+] ";color:var(--muted)}
+.nav.active{border-color:#46583f;background:#111811;color:var(--green)}
+.nav.active:before{content:"[>] ";color:var(--green)}
+.sidefoot{border-top:1px solid var(--line);margin-top:20px;padding-top:12px;color:var(--muted);font-size:11px}
+main{padding:16px}
+.heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:14px}
+h1{font-size:18px;margin:0;font-weight:normal;letter-spacing:.08em}
+h1 span{color:var(--green)}
+.sub{color:var(--muted);font-size:11px;margin-top:5px}
+.tag{border:1px solid var(--line);padding:5px 8px;color:var(--muted);white-space:nowrap}
+.device{border:1px solid var(--line);padding:12px;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.device strong{font-size:14px;color:#fff;font-weight:normal}
+.muted{color:var(--muted);font-size:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.card{border:1px solid var(--line);padding:13px;min-width:0}
+.cardtitle{color:var(--green);font-size:11px;letter-spacing:.14em;border-bottom:1px dashed var(--line);padding-bottom:9px;margin-bottom:13px}
+.big{font-size:31px;line-height:1.2;color:#fff;margin:7px 0 13px}
+.big small{font-size:12px;color:var(--muted)}
+select{width:100%;background:#080a09;color:var(--text);border:1px solid #3a463d;padding:10px;outline:none}
+select:focus{border-color:var(--green)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.preset{background:#0a0d0b;border:1px solid #344037;color:#b7c1b8;padding:7px 10px}
+.preset.active{border-color:var(--green);color:var(--green);background:#141c11}
+.btn{background:var(--green);color:#10150c;border:0;padding:10px 13px;font:bold 12px Consolas,monospace;letter-spacing:.06em}
+.btn.secondary{background:transparent;border:1px solid #465348;color:var(--text)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.row{display:flex;gap:8px;align-items:center;margin-top:12px}
+.row>*{flex:1}
+.hint{font-size:11px;color:var(--muted);margin-top:10px}
+.log{margin-top:13px;border:1px solid var(--line);background:#070907;padding:11px;min-height:94px}
+.logtitle{color:var(--muted);font-size:11px;margin-bottom:7px}
+.logline{margin:3px 0;color:#91a093;overflow-wrap:anywhere}
+.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}
+.hidden{display:none!important}
+.footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;margin-top:12px}
+.loading{position:fixed;inset:0;background:#080a09;z-index:5;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .35s}
+.loading.done{opacity:0;pointer-events:none}
+.loadbox{width:min(560px,100%);border:1px solid var(--line);padding:24px;background:#0b0e0c}
+.loadtitle{font-size:16px;color:var(--green);letter-spacing:.16em;margin-bottom:18px}
+.loadline{color:#9ba89d;margin:7px 0}
+.bar{height:3px;background:#1d271f;margin-top:20px;overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--green);transition:width .25s}
+.input-layout{display:grid;grid-template-columns:minmax(230px,310px) 1fr;gap:16px;align-items:start}
+.mouse-stage{display:flex;align-items:center;justify-content:center;min-height:330px;border:1px solid var(--line);background:#080b09;padding:14px}
+.mouse-svg{width:min(230px,100%);height:auto;overflow:visible}
+.mouse-part{fill:#151d17;stroke:#657468;stroke-width:2;transition:fill .08s,stroke .08s,filter .08s}
+.mouse-part.pressed{fill:var(--green);stroke:var(--green);filter:drop-shadow(0 0 5px #baff6577)}
+.mouse-line{fill:none;stroke:#657468;stroke-width:2}
+.mouse-label{fill:#a8b5aa;font:10px Consolas,monospace;letter-spacing:1px}
+.input-list{display:grid;gap:7px}
+.input-row{display:flex;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--line);background:#090c0a}
+.input-row .state{color:var(--muted)}
+.input-row.active{border-color:#60784d}
+.input-row.active .state{color:var(--green)}
+.wheel-readout{color:var(--green);font-size:18px}
+.input-note{border-left:2px solid var(--line);padding:9px 11px;color:var(--muted);font-size:11px;margin-top:12px}
+.mouse-foot{font-size:11px;color:var(--muted);margin-top:10px}
 
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font: 13px/1.5 Consolas, "Courier New", monospace;
-  letter-spacing: .025em;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg, transparent 0 3px, #ffffff03 4px
-  );
-}
-
-button, select { font: inherit; }
-button { cursor: pointer; }
-
-.wrap { max-width: 1120px; margin: auto; padding: 20px; }
-
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--line);
-  padding: 13px 16px;
-  background: #0b0e0c;
-}
-
-.brand { color: var(--green); font-weight: bold; letter-spacing: .18em; }
-.brand small { display: block; color: var(--muted); font-weight: normal; }
-.status { color: var(--muted); }
-
-.dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--red);
-  margin-right: 8px;
-}
-
-.dot.on { background: var(--green); }
-
-.layout {
-  display: grid;
-  grid-template-columns: 205px 1fr;
-  gap: 13px;
-  margin-top: 13px;
-}
-
-.box { border: 1px solid var(--line); background: var(--panel); min-width: 0; }
-.side { padding: 12px; }
-
-.label, .sub, .muted, .hint {
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.label { margin: 5px 0 12px; }
-
-.nav {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: 1px solid transparent;
-  color: #9ba89e;
-  padding: 10px;
-  margin: 3px 0;
-}
-
-.nav::before { content: "[+] "; }
-.nav.active {
-  border-color: #46583f;
-  background: #111811;
-  color: var(--green);
-}
-.nav.active::before { content: "[>] "; }
-
-.sidefoot {
-  border-top: 1px solid var(--line);
-  margin-top: 20px;
-  padding-top: 12px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-main { padding: 16px; }
-
-.heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 13px;
-  margin-bottom: 14px;
-}
-
-h1 { font-size: 18px; margin: 0; font-weight: normal; }
-h1 span { color: var(--green); }
-
-.tag { border: 1px solid var(--line); padding: 5px 8px; color: var(--muted); }
-
-.device {
-  border: 1px solid var(--line);
-  padding: 12px;
-  margin-bottom: 13px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.device strong { font-size: 14px; color: white; font-weight: normal; }
-
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
-.card { border: 1px solid var(--line); padding: 13px; min-width: 0; }
-
-.cardtitle {
-  color: var(--green);
-  font-size: 11px;
-  letter-spacing: .14em;
-  border-bottom: 1px dashed var(--line);
-  padding-bottom: 9px;
-  margin-bottom: 13px;
-}
-
-.big { font-size: 31px; color: white; margin: 7px 0 13px; }
-.big small { font-size: 12px; color: var(--muted); }
-
-select {
-  width: 100%;
-  background: #080a09;
-  color: var(--text);
-  border: 1px solid #3a463d;
-  padding: 10px;
-}
-
-.presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
-
-.preset {
-  background: #0a0d0b;
-  border: 1px solid #344037;
-  color: #b7c1b8;
-  padding: 7px 10px;
-}
-
-.preset.active { border-color: var(--green); color: var(--green); }
-
-.btn {
-  background: var(--green);
-  color: #10150c;
-  border: 0;
-  padding: 10px 13px;
-  font-weight: bold;
-}
-
-.btn.secondary { background: transparent; border: 1px solid #465348; color: var(--text); }
-.btn:disabled { opacity: .35; cursor: not-allowed; }
-
-.row { display: flex; gap: 8px; margin-top: 12px; }
-.row > * { flex: 1; min-width: 0; }
-
-.hint { margin-top: 10px; }
-
-.log { margin-top: 13px; border: 1px solid var(--line); background: #070907; padding: 11px; min-height: 80px; }
-.logtitle { color: var(--muted); font-size: 11px; margin-bottom: 7px; }
-.logline { margin: 3px 0; color: #91a093; overflow-wrap: anywhere; }
-.ok { color: var(--green); }
-.warn { color: var(--amber); }
-.bad { color: var(--red); }
-.hidden { display: none !important; }
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 10px;
-  margin-top: 12px;
-}
-
-.loading {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  transition: opacity .35s;
-}
-
-.loading.done { opacity: 0; pointer-events: none; }
-
-.loadbox {
-  width: min(560px, 100%);
-  border: 1px solid var(--line);
-  padding: 24px;
-  background: #0b0e0c;
-}
-
-.loadtitle { color: var(--green); margin-bottom: 18px; letter-spacing: .16em; }
-.loadline { color: #9ba89d; margin: 7px 0; }
-.bar { height: 3px; background: #1d271f; margin-top: 20px; }
-.bar span { display: block; height: 100%; width: 0; background: var(--green); transition: width .25s; }
-
-.input-layout {
-  display: grid;
-  grid-template-columns: minmax(220px, 310px) 1fr;
-  gap: 16px;
-}
-
-.mouse-stage {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 320px;
-  border: 1px solid var(--line);
-  background: #080b09;
-}
-
-.mouse-svg { width: 230px; max-width: 100%; }
-
-.mouse-part {
-  fill: #151d17;
-  stroke: #657468;
-  stroke-width: 2;
-}
-
-.mouse-part.pressed {
-  fill: var(--green);
-  stroke: var(--green);
-}
-
-.mouse-line { fill: none; stroke: #657468; stroke-width: 2; }
-.mouse-label { fill: #a8b5aa; font: 10px Consolas, monospace; }
-
-.input-list { display: grid; gap: 7px; }
-
-.input-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  background: #090c0a;
-}
-
-.input-row .state { color: var(--muted); }
-.input-row.active { border-color: #60784d; }
-.input-row.active .state { color: var(--green); }
-.wheel-readout { color: var(--green); font-size: 18px; }
-
-@media (max-width: 720px) {
-  .wrap { padding: 9px; }
-  .layout, .grid, .input-layout { grid-template-columns: 1fr; }
-  .side { display: flex; flex-wrap: wrap; gap: 4px; }
-  .side .label, .sidefoot { width: 100%; }
-  .nav { width: auto; flex: 1; }
-  .heading, .device { flex-direction: column; align-items: flex-start; }
+/* WALLHACK-INSPIRED TERMINAL SKIN */
+body{background:#000;color:#f4f4f4;letter-spacing:0;font-family:Consolas,"Courier New",monospace;font-size:13px}
+body:before{display:none}
+.wrap{max-width:none;width:100%;min-height:100vh;padding:10px}
+.top{border:0;border-bottom:1px solid #333;background:#000;padding:0 0 8px}
+.brand{color:#fff;font-size:0;letter-spacing:0}
+.brand:before{content:"WH_TERMINAL";font-size:13px}
+.brand small{font-size:11px;color:#aaa;letter-spacing:0}
+.status{color:#ddd}
+.dot{border-radius:0;background:#777}
+.dot.on{background:#00e56b;box-shadow:none}
+.layout{display:block;margin-top:8px}
+.side{border:0;background:#000;padding:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.side .label,.sidefoot{display:none}
+.nav{width:auto;margin:0;padding:5px 9px;color:#eee;border:1px solid transparent;text-align:center}
+.nav:before{content:""}
+.nav.active{border:1px solid #ddd;background:#000;color:#fff;text-decoration:underline}
+.nav.active:before{content:""}
+main{padding:10px 0;border:0;background:#000}
+.heading{border:0;margin:0 0 12px;padding:0;align-items:center}
+h1{font-size:13px;letter-spacing:0}
+h1 span{color:#00e56b}
+.sub,.muted,.hint{color:#999;font-size:11px}
+.tag{border:0;color:#ddd;padding:0}
+.device{border:0;border-bottom:1px solid #222;padding:8px 0;background:#000}
+.device strong{font-size:12px}
+.grid{grid-template-columns:minmax(320px,1fr) minmax(260px,1fr);gap:28px;max-width:850px}
+.card{border:0;background:#000;padding:8px 0}
+.cardtitle{color:#fff;border:0;margin-bottom:8px;padding:0;font-size:12px;letter-spacing:0}
+.big{font-size:13px;display:inline;margin:0 8px 0 0}
+.big small{color:#fff}
+.presets{display:inline-flex;margin:6px 0;gap:3px}
+.preset{background:#000;color:#fff;border:1px solid #555;padding:4px 7px}
+.preset.active{border-color:#fff;background:#fff;color:#000}
+select{background:#000;border:0;border-bottom:1px solid #666;color:#fff;padding:5px;max-width:280px}
+.btn{background:#fff;color:#000;padding:5px 9px;font-weight:normal;border:1px solid #fff}
+.btn.secondary{background:#000;color:#fff;border:1px solid #777}
+.row{margin-top:8px;max-width:480px}
+.hint{max-width:520px}
+.log{background:#000;border:1px solid #333;max-width:850px}
+.logtitle{color:#ddd}
+.logline{color:#aaa}
+.footer{border-top:1px solid #333;padding-top:6px;color:#aaa}
+#page-input .input-layout{grid-template-columns:minmax(220px,300px) minmax(250px,400px)}
+.mouse-stage{border:0;background:#000;min-height:340px}
+.mouse-part{fill:#000;stroke:#ddd;stroke-width:1.4;stroke-dasharray:4 2}
+.mouse-part.pressed{fill:#fff;stroke:#fff}
+.mouse-line{stroke:#fff;stroke-dasharray:4 2}
+.mouse-label{fill:#fff}
+.input-row{background:#000;border:0;border-bottom:1px solid #333;padding:7px 0}
+.input-row.active{border-color:#fff}
+.input-row .state{color:#aaa}
+.input-row.active .state{color:#fff}
+.wheel-readout{color:#fff}
+.loading{background:#000;padding:20px;justify-content:center;align-items:flex-start}
+.loadbox{width:326px;border:0;background:#000;padding:0;margin-top:20px}
+.loadtitle{font-size:14px;color:#fff;letter-spacing:0;margin:0 0 8px}
+.cursor{animation:blink 1s steps(2,start) infinite}
+.bar{height:34px;border:1px solid #eee;background:#000;margin:0;padding:4px;overflow:hidden}
+.bar span{height:100%;background:#eee;transition:width .25s}
+.loadpercent{text-align:center;color:#fff;margin-top:7px;font-size:13px}
+.loadsignature{color:#aaa;text-align:center;margin-top:32px;line-height:1.5}
+.loadline{display:none}
+@keyframes blink{to{visibility:hidden}}
+@media(max-width:700px){
+ .grid,#page-input .input-layout{grid-template-columns:1fr}
+ .wrap{padding:8px}
+ .heading{gap:8px}
+ .nav{padding:5px}
 }
 </style>
 </head>
-
 <body>
 
 <div class="loading" id="loading">
   <div class="loadbox">
-    <div class="loadtitle">+ TERMINAL / BOOT SEQUENCE</div>
-    <div id="bootlog">
-      <div class="loadline">[....] Loading terminal modules</div>
-      <div class="loadline">[....] Checking browser HID support</div>
-      <div class="loadline">[....] Preparing mouse diagnostics</div>
-      <div class="loadline">[....] Waiting for hardware permission</div>
-    </div>
+    <div class="loadtitle">INITIALIZING SYSTEM<span class="cursor">_</span></div>
     <div class="bar"><span id="barfill"></span></div>
+    <div class="loadpercent" id="loadpercent">0% COMPLETE</div>
+    <div class="loadsignature">WH_TERMINAL V1.0.0<br>WALLHACK 2026</div>
   </div>
 </div>
 
@@ -320,7 +180,6 @@ select {
   <button class="nav" data-page="device">DEVICE INFO</button>
   <button class="nav" data-page="input">INPUT MONITOR</button>
   <button class="nav" data-page="logs">SYSTEM LOG</button>
-
   <div class="sidefoot">
     TARGET DEVICE<br>STEELSERIES AEROX 3<br><br>
     USB IDs<br>1038:1838 / 2.4 GHz<br><br>
@@ -329,21 +188,15 @@ select {
 </aside>
 
 <main class="box">
-
 <section id="page-performance">
   <div class="heading">
-    <div>
-      <h1><span>//</span> DEVICE CONTROL</h1>
-      <div class="sub">AEROX 3 WIRELESS / CONFIGURATION TERMINAL</div>
-    </div>
+    <div><h1><span>//</span> DEVICE CONTROL</h1><div class="sub">AEROX 3 WIRELESS / CONFIGURATION TERMINAL</div></div>
     <div class="tag" id="connectiontag">NOT CONNECTED</div>
   </div>
 
   <div class="device">
-    <div>
-      <strong>STEELSERIES AEROX 3 WIRELESS</strong>
-      <div class="muted" id="devicehint">Connect the 2.4 GHz USB receiver. Bluetooth is not targeted.</div>
-    </div>
+    <div><strong>STEELSERIES AEROX 3 WIRELESS</strong>
+    <div class="muted" id="devicehint">Connect the 2.4 GHz USB receiver. Bluetooth mode is not targeted.</div></div>
     <button class="btn" id="connect">CONNECT DEVICE</button>
   </div>
 
@@ -352,7 +205,6 @@ select {
       <div class="cardtitle">+ SENSOR / DPI PRESETS</div>
       <div class="sub">ONBOARD SENSITIVITY STAGES</div>
       <div class="big"><span id="dpivalue">800</span> <small>DPI</small></div>
-
       <div class="presets">
         <button class="preset" data-dpi="400">400</button>
         <button class="preset active" data-dpi="800">800</button>
@@ -361,7 +213,6 @@ select {
         <button class="preset" data-dpi="2400">2400</button>
         <button class="preset" data-dpi="3200">3200</button>
       </div>
-
       <label class="sub" for="dpis">DPI STAGE LIST (MAX 5)</label>
       <select id="dpis">
         <option value="400,800,1200,2400,3200">400 / 800 / 1200 / 2400 / 3200</option>
@@ -375,72 +226,74 @@ select {
         <option value="2400">2400 only</option>
         <option value="3200">3200 only</option>
       </select>
-
       <div class="row">
         <button class="btn" id="applydpi" disabled>APPLY DPI STAGES</button>
         <button class="btn secondary" id="savedpi" disabled>SAVE TO MOUSE</button>
       </div>
-
-      <div class="hint">Connect first. Choose stages and apply them. Hardware command support is experimental.</div>
+      <div class="hint">Quick presets set one DPI stage. Use the stage list for up to five stages, then click APPLY. The mouse DPI button cycles configured stages.</div>
     </div>
 
     <div class="card">
       <div class="cardtitle">+ REPORT RATE / POLLING</div>
       <div class="sub">2.4 GHZ RECEIVER REPORT FREQUENCY</div>
       <div class="big"><span id="pollvalue">1000</span> <small>Hz</small></div>
-
       <select id="polling">
         <option value="1000">1000 Hz / 1 ms</option>
         <option value="500">500 Hz / 2 ms</option>
         <option value="250">250 Hz / 4 ms</option>
         <option value="125">125 Hz / 8 ms</option>
       </select>
-
-      <div style="margin-top:12px">
-        <button class="btn" id="applypoll" disabled>APPLY POLLING RATE</button>
-      </div>
-
-      <div class="hint">Changing the selector alone does not change the mouse.</div>
+      <div style="margin-top:12px"><button class="btn" id="applypoll" disabled>APPLY POLLING RATE</button></div>
+      <div class="hint">Documented receiver options: 125 / 250 / 500 / 1000 Hz. Connect first; changing the selector alone does not alter the mouse.</div>
     </div>
   </div>
 
   <div class="log">
     <div class="logtitle">+ LIVE OUTPUT</div>
-    <div id="logs">Waiting for commands...</div>
+    <div id="logs"><div class="logline">[BOOT] Terminal ready. Connect the mouse to begin.</div></div>
   </div>
 </section>
 
 <section id="page-device" class="hidden">
-  <div class="heading">
-    <div><h1><span>//</span> DEVICE INFORMATION</h1><div class="sub">HARDWARE DETAILS</div></div>
-  </div>
+  <div class="heading"><div><h1><span>//</span> DEVICE INFO</h1><div class="sub">HARDWARE ENUMERATION DETAILS</div></div></div>
   <div class="card">
-    <div class="cardtitle">+ CONNECTED DEVICE</div>
-    <div id="details">No device connected.</div>
+    <div class="cardtitle">+ SELECTED HID INTERFACE</div>
+    <div id="details" class="sub">No device connected.</div>
+    <p class="hint">The browser requires your permission before it can access the mouse.</p>
   </div>
 </section>
 
 <section id="page-input" class="hidden">
   <div class="heading">
-    <div><h1><span>//</span> INPUT MONITOR</h1><div class="sub">LIVE MOUSE INPUT</div></div>
+    <div><h1><span>//</span> INPUT MONITOR</h1><div class="sub">LIVE MOUSE BUTTON / WHEEL DIAGNOSTICS</div></div>
     <div class="tag" id="inputtag">WAITING FOR INPUT</div>
   </div>
 
   <div class="input-layout">
-    <div class="mouse-stage">
-      <svg class="mouse-svg" viewBox="0 0 200 300" aria-label="Mouse button visualizer">
-        <path class="mouse-part" id="m-body" d="M55 105 Q55 40 100 35 Q145 40 145 105 L145 220 Q145 260 100 265 Q55 260 55 220 Z"/>
-        <path class="mouse-part" id="m-left" d="M58 105 L58 75 Q60 43 98 40 L98 120 L58 120 Z"/>
-        <path class="mouse-part" id="m-right" d="M102 40 Q140 43 142 75 L142 120 L102 120 Z"/>
-        <path class="mouse-line" d="M100 40 L100 120"/>
-        <rect class="mouse-part" id="m-wheel" x="92" y="70" width="16" height="35" rx="7"/>
-        <rect class="mouse-part" id="m-back" x="145" y="145" width="12" height="30" rx="4"/>
-        <rect class="mouse-part" id="m-forward" x="145" y="180" width="12" height="30" rx="4"/>
-        <text class="mouse-label" x="8" y="285">AEROX / INPUT MAP</text>
-      </svg>
+    <div>
+      <div class="mouse-stage">
+        <svg id="mouse-diagram" class="mouse-svg" viewBox="0 0 220 330" role="img" aria-label="Mouse diagram that lights up when buttons are pressed">
+          <path class="mouse-part" id="m-left" d="M110 18 C69 18 40 43 35 86 L29 224 C27 273 59 306 110 308 Z"/>
+          <path class="mouse-part" id="m-right" d="M110 18 C151 18 180 43 185 86 L191 224 C193 273 161 306 110 308 Z"/>
+          <path class="mouse-line" d="M110 18 L110 128"/>
+          <path class="mouse-line" d="M35 86 Q73 94 110 88 Q147 94 185 86"/>
+          <rect class="mouse-part" id="m-wheel" x="99" y="55" width="22" height="50" rx="10"/>
+          <path class="mouse-line" d="M110 61 V95"/>
+          <rect class="mouse-part" id="m-back" x="25" y="133" width="12" height="37" rx="5" transform="rotate(-3 31 151)"/>
+          <rect class="mouse-part" id="m-forward" x="22" y="176" width="12" height="37" rx="5" transform="rotate(-3 28 194)"/>
+          <text class="mouse-label" x="55" y="45">L</text>
+          <text class="mouse-label" x="160" y="45">R</text>
+          <text class="mouse-label" x="130" y="80">WHEEL</text>
+          <text class="mouse-label" x="3" y="127">BACK</text>
+          <text class="mouse-label" x="1" y="223">FORWARD</text>
+          <text class="mouse-label" x="110" y="326" text-anchor="middle">AEROX / INPUT MAP</text>
+        </svg>
+      </div>
+      <div class="mouse-foot">Move the cursor over this page and press your physical mouse buttons. The illustration tracks browser-visible mouse events.</div>
     </div>
 
     <div>
+      <div class="cardtitle">+ BUTTON STATES</div>
       <div class="input-list">
         <div class="input-row" id="row-left"><span>01 / LEFT CLICK</span><span class="state">RELEASED</span></div>
         <div class="input-row" id="row-right"><span>02 / RIGHT CLICK</span><span class="state">RELEASED</span></div>
@@ -449,410 +302,383 @@ select {
         <div class="input-row" id="row-forward"><span>05 / SIDE FORWARD</span><span class="state">RELEASED</span></div>
         <div class="input-row" id="row-wheel"><span>06 / WHEEL ROTATION</span><span class="state" id="wheel-state">NO MOVEMENT</span></div>
       </div>
-
       <div class="card" style="margin-top:12px">
         <div class="cardtitle">+ WHEEL TELEMETRY</div>
         <div class="wheel-readout" id="wheelreadout">0 ↑ / 0 ↓</div>
-        <div class="hint">Scroll while this page is open to count wheel movement.</div>
+        <div class="hint">Scroll events are counted while this website is open. This is input monitoring only; it does not remap buttons.</div>
       </div>
-
-      <div class="hint">Browser limitation: the visualizer only detects mouse events while this website is open and focused. Side buttons depend on browser support.</div>
+      <div class="input-note">Browser limitation: side buttons are detected only if Windows/Edge reports them as standard Back/Forward mouse events. This page cannot monitor button presses while another app is focused.</div>
     </div>
   </div>
 </section>
 
 <section id="page-logs" class="hidden">
-  <div class="heading">
-    <div><h1><span>//</span> SYSTEM LOG</h1><div class="sub">SESSION EVENTS / DEVICE COMMANDS</div></div>
-    <button class="btn secondary" id="clearlogs">CLEAR LOG</button>
-  </div>
+  <div class="heading"><div><h1><span>//</span> SYSTEM LOG</h1><div class="sub">SESSION EVENTS / DEVICE COMMANDS</div></div><button class="btn secondary" id="clearlogs">CLEAR LOG</button></div>
   <div class="log" id="fullog"></div>
 </section>
 
-<div class="footer">
-  <span>LOCAL WEBHID SESSION</span>
-  <span>UNOFFICIAL / EXPERIMENTAL</span>
-</div>
+<div class="footer"><span>LOCAL WEBHID SESSION</span><span>UNOFFICIAL / EXPERIMENTAL</span></div>
 </main>
 </div>
 </div>
 
 <script>
-(() => {
-"use strict";
+(()=>{
+'use strict';
 
-const $ = id => document.getElementById(id);
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const $=id=>document.getElementById(id);
+let device=null,busy=false;
+const entries=[];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-let device = null;
-let busy = false;
-const entries = [];
+// Experimental Aerox 3 Wireless protocol mapping.
+const DPI_WIRE={
+  100:0x00,
+  400:0x04,
+  800:0x09,
+  1200:0x0d,
+  1600:0x12,
+  2400:0x1b,
+  3200:0x26
+};
 
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#39;"
-  })[char]);
+function encodeDpi(dpi){
+  if(!(dpi in DPI_WIRE)){
+    throw Error('Unsupported DPI preset in this build.');
+  }
+  return DPI_WIRE[dpi];
 }
 
-function log(message, kind = "") {
+function esc(s){
+  return String(s).replace(/[&<>\"]/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;'
+  }[c]));
+}
+
+function log(message,kind=''){
   entries.unshift({
-    text: `[${new Date().toLocaleTimeString()}] ${message}`,
+    text:`[${new Date().toLocaleTimeString()}] ${message}`,
     kind
   });
 
-  $("logs").innerHTML = entries.slice(0, 6)
-    .map(entry => `<div class="logline ${entry.kind}">${escapeHTML(entry.text)}</div>`)
-    .join("");
+  $('logs').innerHTML=entries.slice(0,6).map(e=>
+    `<div class="logline ${e.kind}">${esc(e.text)}</div>`
+  ).join('');
 
-  $("fullog").innerHTML = entries
-    .map(entry => `<div class="logline ${entry.kind}">${escapeHTML(entry.text)}</div>`)
-    .join("");
+  $('fullog').innerHTML=entries.map(e=>
+    `<div class="logline ${e.kind}">${esc(e.text)}</div>`
+  ).join('');
 }
 
-function setConnected(connected) {
-  $("dot").classList.toggle("on", connected);
-  $("topstatus").textContent = connected ? "DEVICE ONLINE" : "DEVICE OFFLINE";
-  $("connectiontag").textContent = connected ? "CONNECTED / HID" : "NOT CONNECTED";
-  $("connect").textContent = connected ? "DISCONNECT" : "CONNECT DEVICE";
+function setConnected(on){
+  $('dot').classList.toggle('on',on);
+  $('topstatus').textContent=on?'DEVICE ONLINE':'DEVICE OFFLINE';
+  $('connectiontag').textContent=on?'CONNECTED / HID':'NOT CONNECTED';
+  $('connect').textContent=on?'DISCONNECT':'CONNECT DEVICE';
 
-  ["applydpi", "savedpi", "applypoll"].forEach(id => {
-    $(id).disabled = !connected;
+  ['applydpi','savedpi','applypoll'].forEach(id=>{
+    $(id).disabled=!on;
   });
 }
 
-function isConfigDevice(candidate) {
-  return (candidate.collections || []).some(collection =>
-    collection.usagePage === 0xFFC0 &&
-    (collection.outputReports || []).some(report => report.reportId === 0)
+function isConfigDevice(d){
+  return(d.collections||[]).some(c=>
+    c.usagePage===0xFFC0 &&
+    (c.outputReports||[]).some(r=>r.reportId===0)
   );
 }
 
-function showDetails(candidate) {
-  $("details").innerHTML =
-    `Name: ${escapeHTML(candidate.productName || "SteelSeries Aerox 3 Wireless")}<br>` +
-    `Vendor ID: 0x${candidate.vendorId.toString(16).padStart(4, "0")}<br>` +
-    `Product ID: 0x${candidate.productId.toString(16).padStart(4, "0")}<br>` +
-    `Config usage page: 0xFFC0<br>` +
-    `Output report ID: 0`;
+function showDetails(d){
+  $('details').innerHTML=
+    `Name: ${esc(d.productName||'SteelSeries Aerox 3 Wireless')}<br>`+
+    `Vendor ID: 0x${d.vendorId.toString(16).padStart(4,'0')}<br>`+
+    `Product ID: 0x${d.productId.toString(16).padStart(4,'0')}<br>`+
+    `Config usage page: 0xFFC0<br>`+
+    `Output report ID: 0 / 64-byte report`;
 }
 
-async function connect() {
-  if (device) {
-    try {
-      device.close();
-    } catch (error) {
-      console.warn(error);
-    }
-
-    device = null;
+async function connect(){
+  if(device){
+    try{device.close();}catch{}
+    device=null;
     setConnected(false);
-    $("details").textContent = "Disconnected.";
-    log("Device disconnected.");
+    $('details').textContent='Disconnected.';
+    log('Device disconnected.');
     return;
   }
 
-  if (!navigator.hid) {
-    log("WebHID unavailable. Open the HTTPS website in Microsoft Edge.", "bad");
-    $("devicehint").textContent = "Use Microsoft Edge and open the HTTPS GitHub Pages URL.";
+  if(!navigator.hid){
+    log('WebHID unavailable. Open the GitHub Pages HTTPS URL in Microsoft Edge.','bad');
+    $('devicehint').textContent='WebHID unavailable. Use Microsoft Edge or Chrome on HTTPS.';
     return;
   }
 
-  try {
-    const choices = await navigator.hid.requestDevice({
-      filters: [{ vendorId: 0x1038, productId: 0x1838 }]
+  try{
+    const choices=await navigator.hid.requestDevice({
+      filters:[{vendorId:0x1038,productId:0x1838}]
     });
 
-    if (!choices.length) {
-      log("No device selected.", "warn");
+    if(!choices.length){
+      log('No device selected.','warn');
       return;
     }
 
-    device = choices.find(isConfigDevice);
+    device=choices.find(isConfigDevice);
 
-    if (!device) {
-      log("No selected interface exposes the expected output report.", "bad");
+    if(!device){
+      log('No selected interface exposes the expected vendor output report. Select the 2.4 GHz receiver interface.','bad');
       return;
     }
 
     await device.open();
+
+    device.addEventListener('inputreport',e=>{
+      const b=Array.from(new Uint8Array(e.data.buffer));
+      log(`INPUT report ${e.reportId}: ${b.slice(0,12).map(x=>x.toString(16).padStart(2,'0')).join(' ')}`);
+    });
+
     setConnected(true);
     showDetails(device);
-
-    log(`Connected: ${device.productName || "Aerox 3 Wireless"}`, "ok");
-    $("devicehint").textContent = "Connected. Apply settings to send commands.";
-  } catch (error) {
-    device = null;
+    log(`Connected: ${device.productName||'Aerox 3 Wireless'} / VID 1038 PID 1838.`,'ok');
+    $('devicehint').textContent='Connected through the receiver. Apply settings to send commands.';
+  }catch(e){
+    device=null;
     setConnected(false);
-    log(`Connection failed: ${error.message || error}`, "bad");
+    log(`Connect failed: ${e.message||e}`,'bad');
   }
 }
 
-/*
-  These commands use a reverse-engineered device profile.
-  They have not been verified on every firmware version.
-  Stop if the mouse behaves unexpectedly.
-*/
-async function sendCommand(bytes, label) {
-  if (!device || !device.opened) {
-    log("Connect the mouse first.", "warn");
+async function send(bytes,label){
+  if(!device||!device.opened){
+    log('No open device. Connect first.','warn');
     return false;
   }
 
-  if (busy) {
-    log("A command is already running.", "warn");
+  if(busy){
+    log('A command is already running.','warn');
     return false;
   }
 
-  busy = true;
+  busy=true;
 
-  try {
-    const report = new Uint8Array(64);
+  try{
+    const report=new Uint8Array(64);
     report.set(bytes);
-
-    await device.sendReport(0, report);
-    log(`SENT ${label}: ${bytes.map(value => value.toString(16).padStart(2, "0")).join(" ")}`, "ok");
-
+    await device.sendReport(0,report);
+    log(`SENT ${label}: ${bytes.map(x=>x.toString(16).padStart(2,'0')).join(' ')}`,'ok');
     await sleep(180);
     return true;
-  } catch (error) {
-    log(`SEND FAILED: ${error.message || error}`, "bad");
+  }catch(e){
+    log(`SEND FAILED (${label}): ${e.message||e}`,'bad');
     return false;
-  } finally {
-    busy = false;
+  }finally{
+    busy=false;
   }
 }
 
-/*
-  DPI values below are based on a reverse-engineered mapping.
-  They are not guaranteed to work on every mouse firmware.
-*/
-const dpiEncoding = {
-  400: 0x04,
-  800: 0x09,
-  1200: 0x0d,
-  1600: 0x12,
-  2400: 0x1b,
-  3200: 0x26
-};
-
-function getStages() {
-  return $("dpis").value.split(",").map(Number);
+function stages(){
+  return $('dpis').value.split(',').map(Number);
 }
 
-async function applyDPI() {
-  const stages = getStages();
+async function applyDpi(){
+  const values=stages();
 
-  if (!stages.length || stages.length > 5) {
-    log("Choose between one and five DPI stages.", "bad");
+  if(values.length<1||values.length>5){
+    log('Choose one to five DPI stages.','bad');
     return;
   }
 
-  if (!stages.every(stage => dpiEncoding[stage] !== undefined)) {
-    log("One or more DPI values are not supported by this build.", "bad");
-    return;
-  }
+  try{
+    const encoded=values.map(encodeDpi);
 
-  const encodedStages = stages.map(stage => dpiEncoding[stage]);
+    if(await send([0x6D,values.length,0,...encoded],
+      `DPI STAGES ${values.join('/')} (active stage 1)`)){
+      $('dpivalue').textContent=values[0];
 
-  /*
-    Experimental packet format. Confirm against your hardware
-    before relying on this to change actual DPI.
-  */
-  const packet = [0x6D, stages.length, 0, ...encodedStages];
-
-  if (await sendCommand(packet, `DPI STAGES ${stages.join("/")}`)) {
-    $("dpivalue").textContent = stages[0];
-
-    document.querySelectorAll(".preset").forEach(button => {
-      button.classList.toggle("active", Number(button.dataset.dpi) === stages[0]);
-    });
+      document.querySelectorAll('.preset').forEach(b=>
+        b.classList.toggle('active',Number(b.dataset.dpi)===values[0])
+      );
+    }
+  }catch(e){
+    log(e.message,'bad');
   }
 }
 
-async function applyPolling() {
-  const rate = Number($("polling").value);
+async function applyPolling(){
+  const rate=Number($('polling').value);
+  const codes={1000:0x00,500:0x01,250:0x02,125:0x03};
 
-  const codes = {
-    1000: 0x00,
-    500: 0x01,
-    250: 0x02,
-    125: 0x03
-  };
-
-  if (await sendCommand([0x6B, codes[rate]], `POLLING ${rate} HZ`)) {
-    $("pollvalue").textContent = String(rate);
+  if(await send([0x6B,codes[rate]],`POLLING ${rate} HZ`)){
+    $('pollvalue').textContent=String(rate);
   }
 }
 
-async function saveSettings() {
-  await sendCommand([0x51, 0x00], "SAVE SETTINGS");
+async function save(){
+  await send([0x51,0x00],'SAVE SETTINGS TO ONBOARD MEMORY');
 }
 
-document.querySelectorAll(".preset").forEach(button => {
-  button.addEventListener("click", async () => {
-    const dpi = Number(button.dataset.dpi);
-    $("dpivalue").textContent = String(dpi);
-    $("dpis").value = String(dpi);
+document.querySelectorAll('.preset').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const dpi=Number(b.dataset.dpi);
+    $('dpivalue').textContent=String(dpi);
+    $('dpis').value=String(dpi);
 
-    document.querySelectorAll(".preset").forEach(item => {
-      item.classList.toggle("active", item === button);
-    });
+    document.querySelectorAll('.preset').forEach(x=>
+      x.classList.toggle('active',x===b)
+    );
 
-    if (device) {
-      await applyDPI();
-    } else {
-      log(`${dpi} DPI selected. Connect the device to apply it.`, "warn");
+    if(device){
+      applyDpi();
+    }else{
+      log(`${dpi} DPI selected. Connect the mouse to apply it.`,'warn');
     }
   });
 });
 
-$("dpis").addEventListener("change", () => {
-  $("dpivalue").textContent = String(getStages()[0]);
+$('dpis').addEventListener('change',()=>{
+  const first=stages()[0];
+  $('dpivalue').textContent=String(first);
+
+  document.querySelectorAll('.preset').forEach(b=>
+    b.classList.toggle('active',Number(b.dataset.dpi)===first)
+  );
 });
 
-$("polling").addEventListener("change", () => {
-  $("pollvalue").textContent = $("polling").value;
+$('polling').addEventListener('change',()=>
+  $('pollvalue').textContent=$('polling').value
+);
+
+$('connect').addEventListener('click',connect);
+$('applydpi').addEventListener('click',applyDpi);
+$('applypoll').addEventListener('click',applyPolling);
+$('savedpi').addEventListener('click',save);
+
+$('clearlogs').addEventListener('click',()=>{
+  entries.length=0;
+  $('logs').innerHTML='';
+  $('fullog').innerHTML='';
 });
 
-$("connect").addEventListener("click", connect);
-$("applydpi").addEventListener("click", applyDPI);
-$("applypoll").addEventListener("click", applyPolling);
-$("savedpi").addEventListener("click", saveSettings);
+document.querySelectorAll('.nav').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.nav').forEach(x=>
+      x.classList.toggle('active',x===b)
+    );
 
-$("clearlogs").addEventListener("click", () => {
-  entries.length = 0;
-  $("logs").textContent = "";
-  $("fullog").textContent = "";
-});
-
-document.querySelectorAll(".nav").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".nav").forEach(item => {
-      item.classList.toggle("active", item === button);
-    });
-
-    ["performance", "device", "input", "logs"].forEach(page => {
-      $("page-" + page).classList.toggle("hidden", page !== button.dataset.page);
-    });
+    ['performance','device','input','logs'].forEach(p=>
+      $('page-'+p).classList.toggle('hidden',p!==b.dataset.page)
+    );
   });
 });
 
-if (navigator.hid) {
-  navigator.hid.addEventListener("disconnect", event => {
-    if (device && event.device === device) {
-      device = null;
+if(navigator.hid){
+  navigator.hid.addEventListener('disconnect',e=>{
+    if(device&&e.device===device){
+      device=null;
       setConnected(false);
-      log("Hardware disconnected.", "warn");
+      log('Hardware disconnected.','warn');
     }
   });
 }
 
 /* Mouse input visualizer */
-const buttonMap = {
-  0: { part: "m-left", row: "row-left", name: "LEFT CLICK" },
-  1: { part: "m-wheel", row: "row-middle", name: "WHEEL CLICK" },
-  2: { part: "m-right", row: "row-right", name: "RIGHT CLICK" },
-  3: { part: "m-back", row: "row-back", name: "SIDE BACK" },
-  4: { part: "m-forward", row: "row-forward", name: "SIDE FORWARD" }
+const buttonMap={
+  0:{part:'m-left',row:'row-left',name:'LEFT CLICK'},
+  2:{part:'m-right',row:'row-right',name:'RIGHT CLICK'},
+  1:{part:'m-wheel',row:'row-middle',name:'WHEEL CLICK'},
+  3:{part:'m-back',row:'row-back',name:'SIDE BACK'},
+  4:{part:'m-forward',row:'row-forward',name:'SIDE FORWARD'}
 };
 
-const pressed = new Set();
+const pressed=new Set();
+let wheelUp=0,wheelDown=0,wheelTimer=null;
 
-let wheelUp = 0;
-let wheelDown = 0;
-let wheelTimer = null;
+function setInput(code,on){
+  const item=buttonMap[code];
+  if(!item)return;
 
-function setInput(code, isPressed) {
-  const item = buttonMap[code];
-  if (!item) return;
+  const part=$(item.part);
+  const row=$(item.row);
 
-  $(item.part).classList.toggle("pressed", isPressed);
-  $(item.row).classList.toggle("active", isPressed);
-  $(item.row).querySelector(".state").textContent =
-    isPressed ? "PRESSED" : "RELEASED";
+  part.classList.toggle('pressed',on);
+  row.classList.toggle('active',on);
+  row.querySelector('.state').textContent=on?'PRESSED':'RELEASED';
 
-  if (isPressed) {
-    $("inputtag").textContent = item.name + " DETECTED";
+  if(on){
+    $('inputtag').textContent=item.name+' DETECTED';
   }
 }
 
-document.addEventListener("pointerdown", event => {
-  if (event.pointerType !== "mouse") return;
-  pressed.add(event.button);
-  setInput(event.button, true);
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='mouse')return;
+  pressed.add(e.button);
+  setInput(e.button,true);
 });
 
-document.addEventListener("pointerup", event => {
-  if (event.pointerType !== "mouse") return;
-  pressed.delete(event.button);
-  setInput(event.button, false);
+document.addEventListener('pointerup',e=>{
+  if(e.pointerType!=='mouse')return;
+  pressed.delete(e.button);
+  setInput(e.button,false);
 });
 
-document.addEventListener("pointercancel", () => {
-  pressed.forEach(code => setInput(code, false));
+document.addEventListener('pointercancel',e=>{
+  if(e.pointerType!=='mouse')return;
+  pressed.forEach(k=>setInput(k,false));
   pressed.clear();
 });
 
-window.addEventListener("blur", () => {
-  pressed.forEach(code => setInput(code, false));
+window.addEventListener('blur',()=>{
+  pressed.forEach(k=>setInput(k,false));
   pressed.clear();
 });
 
-document.addEventListener("contextmenu", event => event.preventDefault());
+document.addEventListener('contextmenu',e=>e.preventDefault());
 
-document.addEventListener("auxclick", event => {
-  if (event.button === 3 || event.button === 4) {
-    event.preventDefault();
-  }
+document.addEventListener('auxclick',e=>{
+  if(e.button===3||e.button===4)e.preventDefault();
 });
 
-document.addEventListener("wheel", event => {
-  if (event.deltaY < 0) wheelUp++;
-  if (event.deltaY > 0) wheelDown++;
+document.addEventListener('wheel',e=>{
+  if(e.deltaY<0)wheelUp++;
+  else if(e.deltaY>0)wheelDown++;
 
-  $("wheelreadout").textContent = `${wheelUp} ↑ / ${wheelDown} ↓`;
-  $("wheel-state").textContent = event.deltaY < 0 ? "SCROLL UP" : "SCROLL DOWN";
-  $("row-wheel").classList.add("active");
-  $("m-wheel").classList.add("pressed");
-  $("inputtag").textContent = event.deltaY < 0 ? "WHEEL UP DETECTED" : "WHEEL DOWN DETECTED";
+  $('wheelreadout').textContent=`${wheelUp} ↑ / ${wheelDown} ↓`;
+  $('wheel-state').textContent=e.deltaY<0?'SCROLL UP':'SCROLL DOWN';
+  $('row-wheel').classList.add('active');
+  $('m-wheel').classList.add('pressed');
+  $('inputtag').textContent=e.deltaY<0?'WHEEL UP DETECTED':'WHEEL DOWN DETECTED';
 
-  clearTimeout(wheelTimer);
+  if(wheelTimer)clearTimeout(wheelTimer);
 
-  wheelTimer = setTimeout(() => {
-    $("row-wheel").classList.remove("active");
-    $("m-wheel").classList.toggle("pressed", pressed.has(1));
-    $("wheel-state").textContent = "NO MOVEMENT";
-  }, 350);
-}, { passive: true });
+  wheelTimer=setTimeout(()=>{
+    $('row-wheel').classList.remove('active');
+    $('m-wheel').classList.toggle('pressed',pressed.has(1));
+    $('wheel-state').textContent='NO MOVEMENT';
+  },350);
+},{passive:true});
 
-/* Startup loading animation */
-async function boot() {
-  const lines = [...document.querySelectorAll("#bootlog .loadline")];
+/* Loading screen: 0 to 100 percent */
+async function boot(){
+  const progress=[20,40,60,80,100];
 
-  const messages = [
-    '<span class="ok">[ OK ]</span> Loading terminal modules',
-    '<span class="ok">[ OK ]</span> Checking browser HID support',
-    '<span class="ok">[ OK ]</span> Preparing mouse diagnostics',
-    '<span class="warn">[ WAIT ]</span> Hardware access needs permission'
-  ];
-
-  for (let index = 0; index < lines.length; index++) {
-    await sleep(330);
-    lines[index].innerHTML = messages[index];
-    $("barfill").style.width = ((index + 1) / lines.length * 100) + "%";
+  for(let i=0;i<progress.length;i++){
+    await sleep(240);
+    $('barfill').style.width=progress[i]+'%';
+    $('loadpercent').textContent=progress[i]+'% COMPLETE';
   }
 
-  await sleep(400);
-  $("loading").classList.add("done");
+  await sleep(450);
+  $('loading').classList.add('done');
+  setTimeout(()=>$('loading').remove(),400);
 
-  setTimeout(() => $("loading").remove(), 400);
-
-  if (!navigator.hid) {
-    log("WebHID unavailable. Open this HTTPS website in Microsoft Edge.", "bad");
-    $("devicehint").textContent = "Use Microsoft Edge with the GitHub Pages HTTPS URL.";
-  } else {
-    log("Boot complete. Click CONNECT DEVICE to grant hardware access.");
+  if(!navigator.hid){
+    log('WebHID unavailable. Open the HTTPS page in Microsoft Edge.','bad');
+    $('devicehint').textContent='Open the GitHub Pages HTTPS URL in Microsoft Edge.';
+  }else{
+    log('Boot complete. Click CONNECT DEVICE to grant access.');
   }
 }
 
