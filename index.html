@@ -3,407 +3,472 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WH_TERMINAL // AEROX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WH_TERMINAL</title>
 <style>
-*{box-sizing:border-box}
-:root{color-scheme:dark}
-body{margin:0;background:#000;color:#fff;font:13px Consolas,"Courier New",monospace}
-button,select{font:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.4;cursor:not-allowed}
-.wrap{padding:10px;min-height:100vh}
-header{height:32px;border-bottom:1px solid #333;display:flex;align-items:flex-start;justify-content:space-between}
-.logo{font-weight:bold;letter-spacing:.04em}
-.logo small{display:block;color:#888;font-size:10px;font-weight:normal}
-.status{color:#aaa;font-size:11px}
-.dot{display:inline-block;width:7px;height:7px;background:#777;margin-right:6px}
-.dot.on{background:#00df70}
-.connectbar{display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 0 10px;border-bottom:1px solid #222}
-.connectbar button{min-width:145px}
-button{background:#000;color:#fff;border:1px solid #777;padding:5px 10px}
-button:hover{border-color:#fff}
-button.active,.nav.active{border-color:#fff;text-decoration:underline}
-button.primary{background:#fff;color:#000;border-color:#fff}
-button.primary:hover{background:#ddd}
-#connectiontag{font-size:11px;color:#aaa}
-nav{display:flex;gap:16px;flex-wrap:wrap;padding:10px 30px;border-bottom:1px solid #222}
-nav button{border:0;padding:3px 4px}
-nav button.active{border:1px solid #fff}
-main{position:relative;min-height:470px;padding:16px 5.5%}
-h1{font-size:13px;font-weight:normal;margin:0 0 5px}
-.muted{color:#999;font-size:11px}
-.controls{width:min(510px,58%);margin-top:28px}
-.row{display:grid;grid-template-columns:1fr 120px 24px;gap:8px;align-items:center;margin:7px 0}
-.row label{white-space:nowrap}
-select{width:100%;background:#000;color:#fff;border:0;border-bottom:1px solid #777;padding:4px}
-.group{margin:20px 0}
-.group-title{margin-bottom:10px}
-.presets{display:flex;gap:5px;flex-wrap:wrap}
-.presets button{padding:4px 7px}
-.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.mouse{position:absolute;right:10%;top:55px;width:220px;height:390px}
-.mouse svg{width:100%;height:100%}
-.mouse path,.mouse rect{fill:#000;stroke:#fff;stroke-width:1.3;stroke-dasharray:5 2}
-.mouse .pressed{fill:#fff;stroke:#fff}
-.mouse text{fill:#fff;font:10px Consolas,monospace}
-.log{margin-top:20px;border-top:1px solid #333;padding-top:8px;max-width:750px}
-.log div{margin:3px 0;color:#aaa;overflow-wrap:anywhere}
-.ok{color:#00df70!important}.warn{color:#ddd!important}.bad{color:#ff7777!important}
-.hidden{display:none!important}
-.bottom-warning{position:fixed;bottom:30px;left:10px;max-width:650px;font-size:10px;color:#888;line-height:1.5}
-.bottom-warning strong{color:#ddd}
-footer{position:fixed;bottom:0;left:0;right:0;height:24px;border-top:1px solid #555;background:#000;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:11px}
-footer button{padding:2px 6px}
-.page{min-height:350px}
-.input-layout{display:grid;grid-template-columns:270px minmax(220px,400px);gap:28px;margin-top:15px}
-.input-list{display:grid;gap:6px}
-.input-row{display:flex;justify-content:space-between;border-bottom:1px solid #333;padding:7px 0}
-.input-row .state{color:#888}
-.input-row.active .state{color:#fff}
-.input-row.active{border-color:#fff}
-.wheel-count{margin-top:15px;font-size:16px}
-.note{font-size:11px;color:#888;line-height:1.5;margin-top:12px}
-.loading{position:fixed;inset:0;background:#000;z-index:10;display:flex;justify-content:center;align-items:flex-start;padding:40px 15px;transition:opacity .4s}
-.loading.done{opacity:0;pointer-events:none}
-.loadbox{width:326px;margin-top:0}
-.loadtitle{font-size:14px;margin-bottom:8px}
-.cursor{animation:blink 1s steps(2,start) infinite}
-.bar{height:34px;border:1px solid #fff;padding:4px}
-.bar span{display:block;height:100%;width:0;background:#fff;transition:width .22s}
-.percent{text-align:center;margin-top:7px}
-.signature{text-align:center;color:#aaa;line-height:1.5;margin-top:32px}
-@keyframes blink{to{visibility:hidden}}
-@media(max-width:760px){
- main{padding:14px 3%}
- .controls{width:100%}
- .mouse{position:relative;top:auto;right:auto;width:180px;height:280px;margin:20px auto}
- .input-layout{grid-template-columns:1fr}
- .bottom-warning{position:static;margin-top:30px}
- footer{position:static}
- .row{grid-template-columns:1fr 110px 18px}
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg: #000;
+  --fg: #f5f5f5;
+  --muted: #888;
+  --line: #aaa;
+  --accent: #00ff77;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; width: 100%; min-height: 100%;
+  background: var(--bg); color: var(--fg);
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 13px;
+}
+body { overflow-x: hidden; }
+button, input, select {
+  font: inherit; color: inherit; background: transparent;
+}
+button { cursor: pointer; }
+button:focus-visible, select:focus-visible {
+  outline: 1px solid white; outline-offset: 3px;
+}
+#boot {
+  position: fixed; inset: 0; z-index: 10; background: #000;
+  display: flex; justify-content: center; align-items: center;
+}
+.bootbox { width: 294px; }
+.boottitle { margin-bottom: 7px; }
+.progress {
+  border: 1px solid #eee; height: 31px; padding: 4px;
+  display: flex; gap: 4px;
+}
+.segment { flex: 1; background: transparent; }
+.segment.full { background: white; }
+.percent { text-align: center; margin-top: 5px; }
+.bootversion { text-align: center; color: #aaa; margin-top: 26px; line-height: 1.5; }
+#app { display: none; padding: 10px 14px 0; min-height: 100vh; }
+.ascii-logo {
+  white-space: pre; line-height: .91; font-size: 11px;
+  font-weight: bold; letter-spacing: 0;
+}
+.version { margin-top: 13px; }
+.instructions { margin-top: 15px; }
+.device-row { margin-top: 15px; display: flex; gap: 9px; align-items: center; }
+.device-row button { border: 0; padding: 0 3px; }
+.status-dot { color: var(--accent); }
+#deviceName { cursor: pointer; }
+.tabs {
+  display: flex; gap: 27px; flex-wrap: wrap;
+  margin: 13px 0 0 58px;
+}
+.tab { border: 0; padding: 0; height: 20px; }
+.tab.active { outline: 1px solid white; outline-offset: 2px; }
+.workspace {
+  display: grid; grid-template-columns: minmax(360px, 1fr) minmax(300px, 1fr);
+  gap: 35px; min-height: 390px; margin-top: 27px;
+}
+.settings { padding-left: 89px; max-width: 650px; }
+.setting {
+  display: grid; grid-template-columns: minmax(180px, 1fr) 20px auto 20px;
+  gap: 8px; align-items: center; margin: 7px 0;
+}
+.setting-label {
+  white-space: nowrap; overflow: hidden;
+}
+.dots { letter-spacing: 1px; }
+.value { min-width: 66px; text-align: center; white-space: nowrap; }
+.arrow { border: 0; padding: 0 3px; }
+.setting select {
+  border: 0; text-align: center; width: 88px;
+}
+.section-title { margin: 0 0 20px; }
+.subnote { color: var(--muted); margin-top: 20px; line-height: 1.6; }
+.mouse-area {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 350px; padding: 10px;
+}
+.mouse {
+  position: relative; width: 220px; height: 365px;
+  border: 2px dashed #eee; border-radius: 35% 35% 27% 27% / 20% 20% 15% 15%;
+  clip-path: polygon(17% 0,83% 0,100% 18%,100% 80%,80% 100%,20% 100%,0 80%,0 18%);
+}
+.mouse:before {
+  content: ""; position: absolute; left: 50%; top: 4%;
+  height: 43%; border-left: 1px dashed white;
+}
+.mouse:after {
+  content: ""; position: absolute; top: 44%; left: 2%; right: 2%;
+  border-top: 1px dashed white;
+}
+.mouse-side {
+  position: absolute; top: 30%; left: -5px; width: 5px;
+  height: 80px; border-left: 1px dashed white;
+}
+.wheel {
+  position: absolute; left: 50%; top: 12%; transform: translateX(-50%);
+  width: 16px; height: 68px; border: 1px dashed white;
+  z-index: 2; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; writing-mode: vertical-rl;
+}
+.mouse-name {
+  position: absolute; bottom: 11%; width: 100%; text-align: center;
+}
+.mouse-button {
+  position: absolute; top: 0; height: 43%; width: 48%;
+  z-index: 1; cursor: pointer;
+}
+.mouse-button.left { left: 1%; border-radius: 35% 5% 0 0; }
+.mouse-button.right { right: 1%; border-radius: 5% 35% 0 0; }
+.mouse-button.pressed { background: #fff2; }
+.footer {
+  position: relative; margin-top: 12px; padding-bottom: 14px;
+}
+.warning { font-weight: bold; margin-bottom: 5px; }
+.muted { color: #999; line-height: 1.5; }
+.bottomrow {
+  display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+  margin-top: 7px;
+}
+.panel {
+  border: 1px solid #888; padding: 4px 7px; min-width: 180px;
+}
+.panel button { border: 0; padding: 0; }
+.panel .caret { float: right; }
+.lang { display: flex; gap: 9px; }
+.lang button { border: 0; padding: 0; color: #777; }
+.lang button.active { color: white; }
+.support { color: #777; text-decoration: underline; }
+#logger {
+  margin-left: auto; align-self: flex-end; width: 180px;
+}
+#logbody { display: none; max-height: 120px; overflow: auto; }
+#message { margin-top: 12px; color: #aaa; min-height: 18px; }
+@media (max-width: 850px) {
+  .workspace { grid-template-columns: 1fr; gap: 5px; }
+  .settings { padding-left: 0; max-width: none; }
+  .mouse-area { min-height: 300px; }
+  .mouse { transform: scale(.8); }
+  .tabs { margin-left: 0; gap: 20px; }
+  #logger { margin-left: 0; }
 }
 </style>
 </head>
 <body>
-
-<div class="loading" id="loading">
- <div class="loadbox">
-  <div class="loadtitle">INITIALIZING SYSTEM<span class="cursor">_</span></div>
-  <div class="bar"><span id="barfill"></span></div>
-  <div class="percent" id="percent">0% COMPLETE</div>
-  <div class="signature">WH_TERMINAL V1.0.0<br>WALLHACK 2026</div>
- </div>
+<div id="boot">
+  <div class="bootbox">
+    <div class="boottitle">ESTABLISHING CONNECTION...</div>
+    <div class="progress" id="progress"></div>
+    <div class="percent" id="percent">0% COMPLETE</div>
+    <div class="bootversion">WH_TERMINAL V1.0.0<br>WALLHACK 2026</div>
+  </div>
 </div>
 
-<div class="wrap">
-<header>
- <div class="logo">WH_TERMINAL<small>AEROX CONTROL / PRE-RELEASE</small></div>
- <div class="status"><span class="dot" id="dot"></span><span id="topstatus">DEVICE OFFLINE</span></div>
-</header>
+<div id="app">
+  <header>
+    <div class="ascii-logo">000000000000000000000000
+0000000000000000000000000
+00000000000000000000000000
+000000000000000000000000000
+0000000000000000000000000000
+000000    0000000    0000000
+000000    0000000    0000000
+000000    0000000    0000000
+0000000  000000000  00000000
+ 0000000 0000000000 00000000
+  000000000 000000000000000
+    0000000 00000000000000
+      0000000 0000000000
+000000    0000000    0000000
+000000    0000000    0000000
+000000    0000000    0000000
+0000000  000000000  00000000
+00000000 0000000000 00000000</div>
+    <div class="version">WH_TERMINAL V1.0.0 - WALLHACK 2026</div>
+    <div class="instructions">NAVIGATE WITH MOUSE OR ARROW &amp; ENTER KEYS</div>
+    <div class="device-row">
+      <button id="connect">[ CONNECT DEVICE ]</button>
+      <span class="status-dot" id="dot">◆</span>
+      <span id="deviceName">NO DEVICE CONNECTED</span>
+    </div>
+  </header>
 
-<div class="connectbar">
- <button class="primary" id="connect">CONNECT DEVICE</button>
- <span id="connectiontag">M-001 / DEMO</span>
-</div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="PERFORMANCE">PERFORMANCE</button>
+    <button class="tab" data-tab="POWER">POWER</button>
+    <button class="tab" data-tab="CALIBRATION">CALIBRATION</button>
+    <button class="tab" data-tab="MAPPING">MAPPING</button>
+    <button class="tab" data-tab="ADVANCED">ADVANCED</button>
+  </nav>
 
-<nav>
- <button class="nav active" data-page="performance">PERFORMANCE</button>
- <button class="nav" data-page="power">POWER</button>
- <button class="nav" data-page="calibration">CALIBRATION</button>
- <button class="nav" data-page="mapping">MAPPING</button>
- <button class="nav" data-page="input">INPUT LOGGER</button>
- <button class="nav" data-page="advanced">ADVANCED</button>
-</nav>
+  <main class="workspace">
+    <section class="settings">
+      <h3 class="section-title" id="sectionTitle"></h3>
+      <div id="settings"></div>
+      <div id="message">WAITING FOR DEVICE CONNECTION.</div>
+      <div class="subnote" id="subnote">Select CONNECT DEVICE to request access to a compatible HID device.</div>
+    </section>
+    <section class="mouse-area">
+      <div class="mouse" id="mouse">
+        <div class="mouse-button left" id="leftButton" title="Left button"></div>
+        <div class="mouse-button right" id="rightButton" title="Right button"></div>
+        <div class="mouse-side"></div>
+        <div class="wheel" id="wheel">|||</div>
+        <div class="mouse-name">AEROX 3</div>
+      </div>
+    </section>
+  </main>
 
-<main>
-<section class="page" id="page-performance">
- <h1>WALLHACK M-001 <span class="muted">(AEROX 3 WIRELESS)</span></h1>
- <div class="muted">CONFIGURATION / PERFORMANCE</div>
-
- <div class="controls">
-  <div class="group">
-   <div class="row">
-    <label for="dpi">CUSTOM DPI</label>
-    <select id="dpi">
-     <option>400</option><option selected>800</option><option>1200</option>
-     <option>1600</option><option>2400</option><option>3200</option>
-    </select><span>&lt; &gt;</span>
-   </div>
-   <div class="row">
-    <label for="polling">CUSTOM POLLING RATE</label>
-    <select id="polling">
-     <option value="1000">1000 HZ</option>
-     <option value="500">500 HZ</option>
-     <option value="250">250 HZ</option>
-     <option value="125">125 HZ</option>
-    </select><span>&lt; &gt;</span>
-   </div>
-   <div class="row">
-    <label for="sync">MOTION SYNC</label>
-    <select id="sync"><option>OFF</option><option>ON</option></select><span>&lt; &gt;</span>
-   </div>
-   <div class="row">
-    <label for="sensor">SENSOR SCANNING MODE</label>
-    <select id="sensor"><option>HIGH</option><option>LOW</option></select><span>&lt; &gt;</span>
-   </div>
-   <div class="actions">
-    <button id="applydpi" disabled>APPLY DPI</button>
-    <button id="applypoll" disabled>APPLY POLLING</button>
-    <button id="save" disabled>SAVE SETTINGS</button>
-   </div>
-  </div>
-  <div class="group">
-   <div class="group-title">DPI PRESETS</div>
-   <div class="presets">
-    <button data-dpi="400">400</button><button data-dpi="800" class="active">800</button>
-    <button data-dpi="1200">1200</button><button data-dpi="1600">1600</button>
-    <button data-dpi="2400">2400</button><button data-dpi="3200">3200</button>
-   </div>
-   <div class="note">Select a preset, then apply it to send a command to the mouse.</div>
-  </div>
- </div>
-
- <div class="mouse" aria-label="Mouse diagram">
-  <svg viewBox="0 0 200 330">
-   <path id="m-left" d="M100 15 Q55 15 40 60 L25 95 L25 265 L60 310 L140 310 L175 265 L175 95 L160 60 Q145 15 100 15 Z"/>
-   <path id="m-right" d="M100 15 Q145 15 160 60 L175 95 L175 265 L140 310 L100 310 Z"/>
-   <path d="M100 25 V165 M40 160 H160" fill="none"/>
-   <rect id="m-wheel" x="92" y="42" width="16" height="48" rx="7"/>
-   <path d="M100 90 V160" fill="none"/>
-   <rect id="m-back" x="18" y="125" width="10" height="25" rx="2"/>
-   <rect id="m-forward" x="18" y="158" width="10" height="25" rx="2"/>
-   <text x="100" y="270" text-anchor="middle">M-001</text>
-  </svg>
- </div>
-
- <div class="log"><div class="muted">LIVE OUTPUT</div><div id="logs">[BOOT] Terminal ready.</div></div>
-</section>
-
-<section class="page hidden" id="page-power">
- <h1>POWER CONFIGURATION</h1>
- <div class="controls">
-  <div class="row"><label>DEVICE STATUS</label><span id="powerstatus">OFFLINE</span></div>
-  <div class="row"><label>CONNECTION TYPE</label><span>2.4 GHZ RECEIVER</span></div>
-  <div class="note">Battery and sleep settings are not exposed by this experimental web interface.</div>
- </div>
-</section>
-
-<section class="page hidden" id="page-calibration">
- <h1>CALIBRATION</h1>
- <div class="controls">
-  <div class="row"><label>ACTIVE DPI</label><span id="caldpi">800</span></div>
-  <div class="row"><label>POLLING RATE</label><span id="calpoll">1000 HZ</span></div>
-  <div class="note">This page displays the currently selected settings. It cannot measure sensor accuracy.</div>
- </div>
-</section>
-
-<section class="page hidden" id="page-mapping">
- <h1>BUTTON MAPPING</h1>
- <div class="note">This browser interface can observe standard mouse events, but it cannot safely remap the Aerox's onboard buttons through the current protocol.</div>
-</section>
-
-<section class="page hidden" id="page-input">
- <h1>INPUT LOGGER</h1>
- <div class="muted">LIVE MOUSE BUTTON / WHEEL EVENTS</div>
- <div class="input-layout">
-  <div class="mouse">
-   <svg viewBox="0 0 200 330">
-    <path id="im-left" d="M100 15 Q55 15 40 60 L25 95 L25 265 L60 310 L140 310 L175 265 L175 95 L160 60 Q145 15 100 15 Z"/>
-    <path id="im-right" d="M100 15 Q145 15 160 60 L175 95 L175 265 L140 310 L100 310 Z"/>
-    <path d="M100 25 V165 M40 160 H160" fill="none"/>
-    <rect id="im-middle" x="92" y="42" width="16" height="48" rx="7"/>
-    <rect id="im-back" x="18" y="125" width="10" height="25" rx="2"/>
-    <rect id="im-forward" x="18" y="158" width="10" height="25" rx="2"/>
-    <text x="100" y="270" text-anchor="middle">INPUT MAP</text>
-   </svg>
-  </div>
-  <div>
-   <div class="input-list">
-    <div class="input-row" id="row-left"><span>LEFT CLICK</span><span class="state">RELEASED</span></div>
-    <div class="input-row" id="row-right"><span>RIGHT CLICK</span><span class="state">RELEASED</span></div>
-    <div class="input-row" id="row-middle"><span>WHEEL CLICK</span><span class="state">RELEASED</span></div>
-    <div class="input-row" id="row-back"><span>SIDE BACK</span><span class="state">RELEASED</span></div>
-    <div class="input-row" id="row-forward"><span>SIDE FORWARD</span><span class="state">RELEASED</span></div>
-    <div class="input-row" id="row-wheel"><span>WHEEL SCROLL</span><span class="state" id="wheelstate">IDLE</span></div>
-   </div>
-   <div class="wheel-count" id="wheelcount">0 UP / 0 DOWN</div>
-   <div class="note">The browser only reports mouse events while this page is open and focused. Side-button reporting depends on browser support.</div>
-  </div>
- </div>
-</section>
-
-<section class="page hidden" id="page-advanced">
- <h1>ADVANCED / DEVICE INFORMATION</h1>
- <div id="details" class="note">No device connected.</div>
- <div class="note">Expected USB receiver IDs: vendor 1038, product 1838. WebHID requires Microsoft Edge or Chrome on HTTPS.</div>
-</section>
-
-<div class="bottom-warning">
- <strong>PRE-RELEASE VERSION</strong><br>
- YOU ARE USING A PRE-RELEASE VERSION OF THE TERMINAL. SOME FEATURES MAY NOT WORK AS EXPECTED, AND CERTAIN SETTINGS OR BEHAVIORS MAY CHANGE BEFORE THE FINAL RELEASE.
-</div>
-</main>
-
-<footer>
- <button id="help">HELP ^</button>
- <span>EN&nbsp;&nbsp; JA&nbsp;&nbsp; CH</span>
- <span>WH_TERMINAL / 2026</span>
-</footer>
+  <footer class="footer">
+    <div class="warning">PRE-RELEASE VERSION</div>
+    <div class="muted">YOU ARE USING A COMMUNITY-MADE INTERFACE INSPIRED BY THE WALLHACK TERMINAL.</div>
+    <div class="muted">HARDWARE FEATURES MAY NOT WORK UNTIL THE DEVICE COMMANDS ARE VERIFIED.</div>
+    <div class="bottomrow">
+      <div class="panel"><button id="helpButton">HELP</button><span class="caret">⌃</span>
+        <div id="helpText" class="muted" style="display:none;margin-top:8px">
+          Connect your mouse receiver, allow the browser permission, and test settings carefully.
+        </div>
+      </div>
+      <div class="lang">
+        <button class="active">EN</button><button>JA</button><button>CH</button>
+      </div>
+      <a class="support" href="https://wallhack.com/" target="_blank" rel="noreferrer">SUPPORT.WALLHACK.COM</a>
+      <div class="panel" id="logger">
+        <button id="loggerButton">INPUT LOGGER</button><span class="caret">⌃</span>
+        <div id="logbody"></div>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <script>
-(()=>{
-"use strict";
-const $=id=>document.getElementById(id);
-let device=null,busy=false;
-const logEntries=[];
-const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const progress = document.getElementById('progress');
+for (let i = 0; i < 16; i++) {
+  const s = document.createElement('div');
+  s.className = 'segment';
+  progress.appendChild(s);
+}
+let progressValue = 0;
+const bootTimer = setInterval(() => {
+  progressValue = Math.min(100, progressValue + 4);
+  [...progress.children].forEach((s, i) => {
+    s.classList.toggle('full', i < Math.round(progressValue / 100 * 16));
+  });
+  document.getElementById('percent').textContent = progressValue + '% COMPLETE';
+  if (progressValue >= 100) {
+    clearInterval(bootTimer);
+    setTimeout(() => {
+      document.getElementById('boot').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      renderTab('PERFORMANCE');
+    }, 250);
+  }
+}, 45);
 
-function log(message,kind=""){
- logEntries.unshift(`[${new Date().toLocaleTimeString()}] ${message}`);
- $("logs").innerHTML=logEntries.slice(0,8).map((s,i)=>
-  `<div class="${kind}">${escapeText(s)}</div>`).join("");
-}
-function escapeText(s){
- return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function setConnected(on){
- $("dot").classList.toggle("on",on);
- $("topstatus").textContent=on?"DEVICE ONLINE":"DEVICE OFFLINE";
- $("connectiontag").textContent=on?"AEROX CONNECTED":"M-001 (DEMO)";
- $("connect").textContent=on?"DISCONNECT DEVICE":"CONNECT DEVICE";
- $("powerstatus").textContent=on?"ONLINE":"OFFLINE";
- ["applydpi","applypoll","save"].forEach(id=>$(id).disabled=!on);
-}
-function isConfigDevice(d){
- return(d.collections||[]).some(c=>c.usagePage===0xFFC0&&
-  (c.outputReports||[]).some(r=>r.reportId===0));
-}
-async function connect(){
- if(device){
-  try{device.close()}catch{}
-  device=null;setConnected(false);
-  $("details").textContent="Disconnected.";
-  log("Device disconnected.");return;
- }
- if(!navigator.hid){
-  log("WebHID is unavailable. Open the HTTPS page in Microsoft Edge.","bad");return;
- }
- try{
-  const found=await navigator.hid.requestDevice({filters:[{vendorId:0x1038,productId:0x1838}]});
-  if(!found.length){log("No device selected.");return;}
-  device=found.find(isConfigDevice);
-  if(!device){log("The selected interface did not expose the expected output report.","bad");return;}
-  await device.open();
-  setConnected(true);
-  $("details").textContent=`${device.productName||"Aerox 3 Wireless"} / VID 1038 / PID 1838 / usage page FFC0`;
-  log("Connected to the selected Aerox receiver.","ok");
- }catch(e){
-  device=null;setConnected(false);
-  log("Connection failed: "+(e.message||e),"bad");
- }
-}
-async function send(bytes,label){
- if(!device||!device.opened){log("Connect the device first.","warn");return false}
- if(busy){log("A command is already running.","warn");return false}
- busy=true;
- try{
-  const report=new Uint8Array(64);report.set(bytes);
-  await device.sendReport(0,report);
-  log("SENT "+label+": "+bytes.map(v=>v.toString(16).padStart(2,"0")).join(" "),"ok");
-  await wait(150);return true;
- }catch(e){log("SEND FAILED: "+(e.message||e),"bad");return false}
- finally{busy=false}
-}
-
-/* Experimental reverse-engineered Aerox command mapping.
-   Verify on the physical mouse; a successful send is not proof of change. */
-const dpiCodes={400:0x04,800:0x09,1200:0x0d,1600:0x12,2400:0x1b,3200:0x26};
-async function applyDpi(){
- const dpi=Number($("dpi").value);
- if(!(dpi in dpiCodes)){log("Unsupported DPI preset.","bad");return}
- if(await send([0x6D,1,0,dpiCodes[dpi]],"DPI "+dpi)){
-  $("caldpi").textContent=dpi;
-  document.querySelectorAll("[data-dpi]").forEach(b=>b.classList.toggle("active",Number(b.dataset.dpi)===dpi));
- }
-}
-async function applyPolling(){
- const rate=Number($("polling").value);
- const code={1000:0,500:1,250:2,125:3}[rate];
- if(await send([0x6B,code],"POLLING "+rate+" HZ"))$("calpoll").textContent=rate+" HZ";
-}
-async function saveSettings(){await send([0x51,0x00],"SAVE SETTINGS")}
-$("connect").addEventListener("click",connect);
-$("applydpi").addEventListener("click",applyDpi);
-$("applypoll").addEventListener("click",applyPolling);
-$("save").addEventListener("click",saveSettings);
-$("dpi").addEventListener("change",()=>{$("caldpi").textContent=$("dpi").value});
-$("polling").addEventListener("change",()=>{$("calpoll").textContent=$("polling").value+" HZ"});
-document.querySelectorAll("[data-dpi]").forEach(b=>b.addEventListener("click",()=>{
- $("dpi").value=b.dataset.dpi;
- document.querySelectorAll("[data-dpi]").forEach(x=>x.classList.toggle("active",x===b));
- $("caldpi").textContent=b.dataset.dpi;
- if(device)applyDpi();else log("DPI selected. Connect the device to apply it.");
-}));
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>{
- document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x===b));
- document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
- $("page-"+b.dataset.page).classList.remove("hidden");
-}));
-$("help").addEventListener("click",()=>alert("Connect the 2.4 GHz Aerox receiver. Select DPI or polling, then click APPLY. Hardware commands are experimental."));
-if(navigator.hid)navigator.hid.addEventListener("disconnect",e=>{
- if(device&&e.device===device){device=null;setConnected(false);log("Mouse disconnected.","warn")}
-});
-
-/* Input logger: browser-visible mouse events */
-const map={
- 0:["im-left","row-left"],2:["im-right","row-right"],
- 1:["im-middle","row-middle"],3:["im-back","row-back"],
- 4:["im-forward","row-forward"]
+let device = null;
+let selectedTab = 'PERFORMANCE';
+const values = {
+  dpi: 1600, polling: 1000, motion: 'OFF', scanning: 'HIGH',
+  sleep: '5 MIN', mode: 'PERFORMANCE', lod: '1.0 MM',
+  debounce: 'DEFAULT', angle: 'OFF', xdpi: 1600, ydpi: 1600
 };
-const pressed=new Set();
-function buttonState(code,on){
- const item=map[code];if(!item)return;
- $(item[0]).classList.toggle("pressed",on);
- $(item[1]).classList.toggle("active",on);
- $(item[1]).querySelector(".state").textContent=on?"PRESSED":"RELEASED";
-}
-document.addEventListener("pointerdown",e=>{
- if(e.pointerType!=="mouse")return;
- pressed.add(e.button);buttonState(e.button,true);
-});
-document.addEventListener("pointerup",e=>{
- if(e.pointerType!=="mouse")return;
- pressed.delete(e.button);buttonState(e.button,false);
-});
-window.addEventListener("blur",()=>{
- pressed.forEach(code=>buttonState(code,false));pressed.clear();
-});
-document.addEventListener("contextmenu",e=>e.preventDefault());
-let up=0,down=0,wheelTimer;
-document.addEventListener("wheel",e=>{
- if(e.deltaY<0)up++;else if(e.deltaY>0)down++;
- $("wheelcount").textContent=`${up} UP / ${down} DOWN`;
- $("wheelstate").textContent=e.deltaY<0?"SCROLL UP":"SCROLL DOWN";
- $("row-wheel").classList.add("active");
- clearTimeout(wheelTimer);
- wheelTimer=setTimeout(()=>{
-  $("row-wheel").classList.remove("active");$("wheelstate").textContent="IDLE";
- },350);
-},{passive:true});
 
-async function boot(){
- for(const n of [20,40,60,80,100]){
-  await wait(250);$("barfill").style.width=n+"%";$("percent").textContent=n+"% COMPLETE";
- }
- await wait(400);$("loading").classList.add("done");
- setTimeout(()=>$("loading").remove(),450);
- if(!navigator.hid)log("WebHID unavailable. Use Microsoft Edge on HTTPS.","warn");
- else log("System initialized. Connect the device to continue.");
+const configs = {
+  PERFORMANCE: [
+    ['CUSTOM DPI', 'dpi', [100, 18000, 100], 'DPI'],
+    ['CUSTOM POLLING RATE', 'polling', [125, 250, 500, 1000], 'HZ'],
+    ['MOTION SYNC', 'motion', ['OFF', 'ON'], ''],
+    ['SENSOR SCANNING MODE', 'scanning', ['HIGH', 'LOW POWER'], '']
+  ],
+  POWER: [
+    ['POWER MODE', 'mode', ['PERFORMANCE', 'LOW POWER'], ''],
+    ['SLEEP TIMER', 'sleep', ['1 MIN', '5 MIN', '10 MIN', 'NEVER'], '']
+  ],
+  CALIBRATION: [
+    ['LIFT-OFF DISTANCE', 'lod', ['0.7 MM', '1.0 MM', '2.0 MM'], ''],
+    ['ANGLE SNAPPING', 'angle', ['OFF', 'ON'], '']
+  ],
+  MAPPING: [
+    ['LEFT BUTTON', 'leftMap', ['LEFT CLICK', 'KEYBOARD', 'DISABLED'], ''],
+    ['RIGHT BUTTON', 'rightMap', ['RIGHT CLICK', 'KEYBOARD', 'DISABLED'], ''],
+    ['SIDE BUTTON 1', 'side1', ['BACK', 'FORWARD', 'DISABLED'], ''],
+    ['SIDE BUTTON 2', 'side2', ['BACK', 'FORWARD', 'DISABLED'], '']
+  ],
+  ADVANCED: [
+    ['X AXIS DPI', 'xdpi', [100, 18000, 100], 'DPI'],
+    ['Y AXIS DPI', 'ydpi', [100, 18000, 100], 'DPI'],
+    ['RESTORE DEFAULTS', 'reset', ['EXECUTE'], '']
+  ]
+};
+
+function setMessage(msg) {
+  document.getElementById('message').textContent = msg;
 }
-boot();
-})();
+function renderTab(tab) {
+  selectedTab = tab;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('sectionTitle').textContent = '';
+  const root = document.getElementById('settings');
+  root.innerHTML = '';
+  configs[tab].forEach(([label, key, options, unit]) => {
+    const row = document.createElement('div');
+    row.className = 'setting';
+    const lab = document.createElement('div');
+    lab.className = 'setting-label';
+    lab.textContent = label;
+    const dots = document.createElement('div');
+    dots.className = 'dots';
+    dots.textContent = '................';
+    const left = document.createElement('button');
+    left.className = 'arrow';
+    left.textContent = '<';
+    left.setAttribute('aria-label', 'Decrease ' + label);
+    const right = document.createElement('button');
+    right.className = 'arrow';
+    right.textContent = '>';
+    right.setAttribute('aria-label', 'Increase ' + label);
+    const value = document.createElement('div');
+    value.className = 'value';
+    value.id = 'value-' + key;
+    const numeric = Array.isArray(options) && options.length === 3 && typeof options[0] === 'number';
+
+    function currentIndex() {
+      if (numeric) return Math.round((Number(values[key]) - options[0]) / options[2]);
+      return options.indexOf(values[key]);
+    }
+    function display() {
+      if (key === 'reset') value.textContent = 'EXECUTE';
+      else value.textContent = values[key] + (unit ? ' ' + unit : '');
+    }
+    function change(dir) {
+      if (key === 'reset') {
+        Object.assign(values, {dpi:1600,polling:1000,motion:'OFF',scanning:'HIGH',sleep:'5 MIN',mode:'PERFORMANCE',lod:'1.0 MM',angle:'OFF',xdpi:1600,ydpi:1600});
+        renderTab(selectedTab);
+        setMessage('DISPLAY VALUES RESET. HARDWARE NOT CHANGED.');
+        return;
+      }
+      if (numeric) {
+        values[key] = Math.max(options[0], Math.min(options[1], Number(values[key]) + dir * options[2]));
+      } else {
+        const i = Math.max(0, Math.min(options.length - 1, currentIndex() + dir));
+        values[key] = options[i];
+      }
+      display();
+      applySetting(key);
+    }
+    left.addEventListener('click', () => change(-1));
+    right.addEventListener('click', () => change(1));
+    row.append(lab, dots, left, value, right);
+    root.appendChild(row);
+    display();
+  });
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => renderTab(b.dataset.tab)));
+
+function report(bytes) {
+  if (!device) throw new Error('Connect a device first.');
+  // Aerox 3 Wireless protocol references indicate output report ID 0
+  // and a 64-byte payload. Hardware writes are experimental.
+  const payload = new Uint8Array(64);
+  payload.set(bytes);
+  return device.sendReport(0, payload);
+}
+async function applySetting(key) {
+  if (!device) {
+    setMessage('DISPLAY UPDATED. CONNECT DEVICE TO TEST HARDWARE CONTROL.');
+    return;
+  }
+  try {
+    if (key === 'dpi') {
+      // Known Aerox 3 wireless DPI command: 0x6D, count, active preset, preset values.
+      // Configure five presets so the selected DPI is available as a preset.
+      const dpiByte = Math.round((values.dpi - 100) / 100);
+      const bytes = [0x6D, 1, 0, dpiByte];
+      await report(bytes);
+    } else if (key === 'polling') {
+      const rates = {1000:0, 500:1, 250:2, 125:3};
+      if (!(values.polling in rates)) {
+        setMessage('THIS POLLING RATE IS NOT SUPPORTED BY THE VERIFIED COMMAND TABLE.');
+        return;
+      }
+      await report([0x6B, rates[values.polling]]);
+    } else {
+      setMessage('DISPLAY UPDATED. THIS SETTING HAS NOT BEEN IMPLEMENTED FOR HARDWARE.');
+      return;
+    }
+    setMessage('COMMAND SENT. CHECK MOUSE BEHAVIOUR TO VERIFY THE CHANGE.');
+  } catch (err) {
+    setMessage('HARDWARE COMMAND FAILED: ' + err.message);
+  }
+}
+
+document.getElementById('connect').addEventListener('click', async () => {
+  if (!('hid' in navigator)) {
+    setMessage('WEBHID UNAVAILABLE. OPEN THIS PAGE IN MICROSOFT EDGE.');
+    return;
+  }
+  try {
+    const devices = await navigator.hid.requestDevice({
+      filters: [{vendorId: 0x1038, productId: 0x1838}]
+    });
+    if (!devices.length) {
+      setMessage('NO DEVICE SELECTED.');
+      return;
+    }
+    device = devices[0];
+    await device.open();
+    document.getElementById('deviceName').textContent = device.productName || 'STEELSERIES AEROX 3 WIRELESS';
+    document.getElementById('dot').style.color = '#00ff77';
+    document.getElementById('connect').textContent = '[ DEVICE CONNECTED ]';
+    setMessage('DEVICE OPENED. HARDWARE COMMANDS ARE EXPERIMENTAL.');
+    device.addEventListener('inputreport', e => {
+      logInput('REPORT ID ' + e.reportId + ' / ' + e.data.byteLength + ' BYTES');
+    });
+  } catch (err) {
+    setMessage('CONNECTION FAILED: ' + err.message);
+  }
+});
+
+document.getElementById('leftButton').addEventListener('click', () => flashButton('leftButton', 'LEFT CLICK'));
+document.getElementById('rightButton').addEventListener('click', () => flashButton('rightButton', 'RIGHT CLICK'));
+function flashButton(id, label) {
+  const el = document.getElementById(id);
+  el.classList.add('pressed');
+  setTimeout(() => el.classList.remove('pressed'), 160);
+  logInput(label);
+}
+document.getElementById('wheel').addEventListener('wheel', e => {
+  e.preventDefault();
+  document.getElementById('wheel').textContent = e.deltaY < 0 ? '↑' : '↓';
+  logInput(e.deltaY < 0 ? 'SCROLL UP' : 'SCROLL DOWN');
+  setTimeout(() => document.getElementById('wheel').textContent = '|||', 250);
+}, {passive:false});
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') {
+    const b = document.querySelector('.tab.active');
+    if (b) b.click();
+    const tabs = [...document.querySelectorAll('.tab')];
+    renderTab(tabs[(tabs.indexOf(b) + 1) % tabs.length].dataset.tab);
+  } else if (e.key === 'ArrowLeft') {
+    const tabs = [...document.querySelectorAll('.tab')];
+    const b = document.querySelector('.tab.active');
+    renderTab(tabs[(tabs.indexOf(b) + tabs.length - 1) % tabs.length].dataset.tab);
+  } else if (e.key === 'Enter') {
+    const b = document.querySelector('.tab.active');
+    if (b) b.click();
+  }
+});
+function logInput(text) {
+  const logger = document.getElementById('logbody');
+  const line = document.createElement('div');
+  line.textContent = new Date().toLocaleTimeString() + '  ' + text;
+  logger.prepend(line);
+}
+document.getElementById('loggerButton').addEventListener('click', () => {
+  const b = document.getElementById('logbody');
+  b.style.display = b.style.display === 'block' ? 'none' : 'block';
+});
+document.getElementById('helpButton').addEventListener('click', () => {
+  const h = document.getElementById('helpText');
+  h.style.display = h.style.display === 'block' ? 'none' : 'block';
+});
 </script>
 </body>
 </html>
